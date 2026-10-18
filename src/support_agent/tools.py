@@ -10,5 +10,5 @@ DATABASE = {
 def get_order_status(order_id):
     order = DATABASE.get(order_id, None)
     if order is None:
-        return "order not found"
-    return order["delivery_status"]
+        return {"found" : False, "error": f"Order {order_id} does not exist"}
+    return {"found" : True, "status" : order["delivery_status"]}
