@@ -25,3 +25,7 @@ def test_already_refunded_order_is_rejected():
 def test_unknown_order_refund_is_rejected():
     result = refund_order("FAKE-999")
     assert result["success"] is False
+
+def test_successful_refund_has_no_error():
+    result = refund_order("ORD-2006")
+    assert "error" not in result

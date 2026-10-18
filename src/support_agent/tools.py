@@ -19,4 +19,4 @@ def refund_order(order_id):
         return {"success" : False, "error": f"Order {order_id} does not exist"}
     if order["delivery_status"] != "Delivered":
         return {"success": False, "error": f"Order {order_id} cannot be refunded"}
-    return {"success": True, "error": f"Refund issued for order {order_id}"}
+    return {"success": True, "status": f"Refund issued for order {order_id}"}
