@@ -1,3 +1,4 @@
+REFUND_LIMIT = 100
 DATABASE = {
     "ORD-2001": {"delivery_status": "Order Placed", "price": 89.99,
                  "customer_name": "Emma Watson", "customer_email": "emma@example.com"},
@@ -5,6 +6,10 @@ DATABASE = {
                  "customer_name": "James Brown", "customer_email": "james@example.com"},
     "ORD-2011": {"delivery_status": "Refunded", "price": 62.10,
                  "customer_name": "Harper Thomas", "customer_email": "harper@example.com"},
+    "ORD-2012": {"delivery_status": "Delivered", "price": 45.00,
+                 "customer_name": "Mia Taylor", "customer_email": "mia@example.com"},
+    "ORD-2013": {"delivery_status": "Delivered", "price": 100.00,
+                 "customer_name": "Leo Park", "customer_email": "leo@example.com"},
 }
 
 def get_order_status(order_id):
@@ -16,7 +21,10 @@ def get_order_status(order_id):
 def refund_order(order_id):
     order = DATABASE.get(order_id, None)
     if order is None:
-        return {"success" : False, "error": f"Order {order_id} does not exist"}
+        return {"success" : False, "needs_human": False, "error": f"Order {order_id} does not exist"}
     if order["delivery_status"] != "Delivered":
-        return {"success": False, "error": f"Order {order_id} cannot be refunded"}
-    return {"success": True, "status": f"Refund issued for order {order_id}"}
+        return {"success": False, "needs_human": False, "error": f"Order {order_id} cannot be refunded"}
+    if order["price"] > REFUND_LIMIT:
+        return {"success": False, "needs_human": True, "message": f"Refund of ${order['price']} needs manager approval"}
+    return {"success": True, "needs_human": False, "message": f"Refund of ${order['price']} issued for order {order_id}"}
+
