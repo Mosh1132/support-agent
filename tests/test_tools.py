@@ -6,9 +6,9 @@ def test_known_order_returns_status():
     assert result["status"] == "Order Placed"
 
 def test_unknown_order_returns_not_found():
-    result = get_order_status("FAKE-999")
+    result = get_order_status("ORD-9999")
     assert result["found"] is False
-    assert "FAKE-999" in result["error"]
+    assert "ORD-9999" in result["error"]
 
 def test_result_does_not_leak_customer_email():
     result = get_order_status("ORD-2001")
@@ -38,3 +38,7 @@ def test_large_refund_needs_human():
 def test_refund_exactly_at_limit_is_allowed():
     result = refund_order("ORD-2013")
     assert result["success"] is True, result
+
+def test_refund_unknown_valid_id_is_rejected():
+    result = refund_order("ORD-9999")
+    assert result["success"] is False
