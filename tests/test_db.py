@@ -27,3 +27,10 @@ def test_seed_orders():
     ).fetchone()
 
     assert row[0] == "Delivered"
+
+def test_calling_seed_orders_twice_does_not_cause_a_crash():
+    connection = get_connection(":memory:")
+    seed_orders(connection)
+    seed_orders(connection)
+    count = connection.execute("SELECT COUNT(*) FROM orders").fetchone()[0]
+    assert count == 5

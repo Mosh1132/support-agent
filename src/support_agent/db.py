@@ -18,6 +18,9 @@ def get_connection(path="orders.db"):
     return connec
 
 def seed_orders(connection):
+    count = connection.execute("SELECT COUNT(*) FROM orders").fetchone()[0]
+    if count > 0:
+        return
     connection.executemany(
         "INSERT INTO orders VALUES(?, ?, ?, ?, ?)", SAMPLE_ORDERS
     )
