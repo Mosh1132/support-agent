@@ -1,3 +1,5 @@
+import json
+
 from support_agent.agent import run_agent
 
 def test_agent_returns_direct_answer(connection):
@@ -8,7 +10,7 @@ def test_agent_returns_direct_answer(connection):
 def test_agent_calls_tool_then_answers(connection):
     def brain(messages):
         if messages[-1]["role"] == "tool":
-            return {"answer": "Status: " + messages[-1]["content"]["status"]}
+            return {"answer": "Status: " + json.loads(messages[-1]["content"])["status"]}
         return {"tool": "get_order_status", "args": {"order_id": "ORD-2001"}}
     assert run_agent("where is ORD-2001?", brain, connection) == "Status: Order Placed"
 
@@ -17,3 +19,17 @@ def test_agent_stops_after_max_steps(connection):
         return {"tool": "get_order_status", "args": {"order_id": "ORD-2001"}}
     result = run_agent("loop forever", brain, connection, max_steps=3)
     assert "human" in result.lower()
+
+def test_tool_result_is_stored_as_text(connection):
+    seen = []
+
+    def brain(messages):
+        seen.append(messages[-1])
+        if messages[-1]["role"] == "tool":
+            return {"answer": "done"}
+        return {"tool": "get_order_status", "args": {"order_id": "ORD-2001"}}
+
+    run_agent("where is ORD-2001?", brain, connection)
+
+    tool_message = seen[-1]
+    assert isinstance(tool_message["content"], str)
