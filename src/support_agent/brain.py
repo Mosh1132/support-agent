@@ -6,7 +6,36 @@ import requests
 from support_agent.config import get_api_key
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
+TOOL_DEFINITIONS = [
+    {
+        "type" : "function",
+        "function" : {
+            "name" : "get_order_status",
+            "description" : "Look up the delivery status of an order by its order ID.",
+            "parameters" : {
+                "type" : "object",
+                "properties" : {
+                    "order_id" : {"type" : "string", "description" : "e.g. ORD-2001"},
+                },
+                "required" : ["order_id"]
+            }
+        }
+    },
+{
+        "type" : "function",
+        "function" : {
+            "name" : "refund_order",
+            "description" : "Refund a delivered order by its order ID. Refunds over $100 are sent to a human for approval.",
+            "parameters" : {
+                "type" : "object",
+                "properties" : {
+                    "order_id" : {"type" : "string", "description" : "e.g. ORD-2001"},
+                },
+                "required" : ["order_id"]
+            }
+        }
+    },
+]
 def parse_response(response):
     message = response['choices'][0]['message']
     if message.get("tool_calls"):
@@ -33,7 +62,7 @@ def call_openai(messages, tools):
             response.raise_for_status()
             return response.json()
         except requests.exceptions.Timeout:
-            logging.warning("Request timed out, retying...")
+            logging.warning("Request timed out, retr, ying...")
         except requests.exceptions.HTTPError as err:
             retry_after = err.response.headers.get('Retry-After')
             status = err.response.status_code
@@ -53,3 +82,9 @@ def call_openai(messages, tools):
 
     logging.warning(f"Request failed after 4 attempts.")
     return None
+
+def openai_brain(messages):
+    response = call_openai(messages, TOOL_DEFINITIONS)
+    if response is None:
+        return {"answer": "Sorry, something went wrong. A human will follow up."}
+    return parse_response(response)
