@@ -62,7 +62,7 @@ def call_openai(messages, tools):
             response.raise_for_status()
             return response.json()
         except requests.exceptions.Timeout:
-            logging.warning("Request timed out, retr, ying...")
+            logging.warning("Request timed out, retrying...")
         except requests.exceptions.HTTPError as err:
             retry_after = err.response.headers.get('Retry-After')
             status = err.response.status_code
