@@ -22,20 +22,23 @@ def test_text_answer_is_translated():
 def test_tool_request_is_translated():
     response = {"choices": [{"message": {
         "content": None,
-        "tool_calls": [{"function": {
+        "tool_calls": [{"id" : "call_1", "function": {
             "name": "get_order_status",
             "arguments": '{"order_id":"ORD-2001"}'
         }}]
     }}]}
-    assert parse_response(response) == {
+    result = parse_response(response)
+    assert result == {
         "tool": "get_order_status",
         "args": {"order_id": "ORD-2001"},
+        "id": "call_1"
     }
+    assert result["id"] == "call_1"
 
 def test_tool_call_wins_even_if_text_present():
     response = {"choices": [{"message": {
         "content": "Let me check that.",
-        "tool_calls": [{"function": {
+        "tool_calls": [{"id" : "call_1","function": {
             "name": "get_order_status",
             "arguments": '{"order_id":"ORD-2001"}'
         }}]
@@ -48,3 +51,5 @@ def test_call_fails_once_with_a_500_then_succeeds(monkeypatch):
     monkeypatch.setattr(brain.time, "sleep", lambda seconds: None)
     monkeypatch.setenv("LLM_API_KEY", "test-key")
     assert brain.call_openai([], []) == {"ok": True}
+
+
