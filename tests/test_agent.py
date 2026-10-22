@@ -52,3 +52,25 @@ def test_tool_messages_carry_the_call_id(connection):
     last = seen[-1]
     assert last[-2]["role"] == "assistant"
     assert last[-1]["tool_call_id"] == "call_1"
+
+def test_tool_does_not_crash_when_non_existent_tool_is_called(connection):
+    def brain(messages):
+        if messages[-1]["role"] == "tool":
+            return {"answer": "recovered"}
+        return {"tool": "delete_everything", "args": {}, "id": "call_1"}
+
+    result = run_agent("do something bad", brain, connection)
+    assert result == "recovered"
+
+def test_tool_message_contains_tool_name(connection):
+    seen = []
+    def brain(messages):
+        seen.extend(messages)
+        if messages[-1]["role"] == "tool":
+            return {"answer": "recovered"}
+        return {"tool": "launch_rockets", "args": {}, "id": "call_1"}
+
+    run_agent("do something", brain, connection)
+
+    tool_message = seen[-1]
+    assert "launch_rockets" in tool_message["content"]

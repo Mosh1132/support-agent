@@ -12,8 +12,11 @@ def run_agent(question, brain, connection, max_steps=5):
             return decision["answer"]
         if "tool" in decision:
             func = TOOLS.get(decision["tool"])
-            args = decision["args"]
-            result = func(**args, connection=connection)
+            if func is None:
+                result = {"success": False, "error": f"Unknown tool: {decision['tool']}"}
+            else:
+                args = decision["args"]
+                result = func(**args, connection=connection)
             messages.append({
                 "role": "assistant",
                 "content": None,
