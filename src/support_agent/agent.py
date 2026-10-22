@@ -16,7 +16,10 @@ def run_agent(question, brain, connection, max_steps=5):
                 result = {"success": False, "error": f"Unknown tool: {decision['tool']}"}
             else:
                 args = decision["args"]
-                result = func(**args, connection=connection)
+                try:
+                    result = func(**args, connection=connection)
+                except TypeError:
+                    result = {"success": False, "error": f"Invalid arguments for {decision['tool']}"}
             messages.append({
                 "role": "assistant",
                 "content": None,

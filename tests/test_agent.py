@@ -74,3 +74,13 @@ def test_tool_message_contains_tool_name(connection):
 
     tool_message = seen[-1]
     assert "launch_rockets" in tool_message["content"]
+
+def test_tool_does_not_crash_when_non_existent_arg_is_called(connection):
+    def brain(messages):
+        if messages[-1]["role"] == "tool":
+            return {"answer": "recovered"}
+        return {"tool": "get_order_status", "args": {"wrong_name" : "x"}, "id": "call_1"}
+
+    result = run_agent("do something", brain, connection)
+
+    assert result == "recovered"
