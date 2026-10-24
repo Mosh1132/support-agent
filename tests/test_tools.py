@@ -42,3 +42,8 @@ def test_refund_exactly_at_limit_is_allowed(connection):
 def test_refund_unknown_valid_id_is_rejected(connection):
     result = refund_order("ORD-9999", connection)
     assert result["success"] is False
+
+def test_refund_creates_pending_approval(connection):
+    refund_order("ORD-2006", connection)
+    row = connection.execute("SELECT order_id, status FROM approvals").fetchall()
+    assert row == [("ORD-2006", "pending")]

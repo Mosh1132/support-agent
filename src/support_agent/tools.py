@@ -21,6 +21,7 @@ def refund_order(order_id, connection):
     if row[0] != "Delivered":
         return {"success": False, "needs_human": False, "error": f"Order {clean_id} cannot be refunded"}
     if row[1] > REFUND_LIMIT:
+        connection.execute("INSERT INTO approvals (order_id, amount, status) VALUES (?, ?, ?)", (clean_id, row[1], 'pending'))
         return {"success": False, "needs_human": True, "message": f"Refund of ${row[1]} needs manager approval"}
     return {"success": True, "needs_human": False, "message": f"Refund of ${row[1]} issued for order {clean_id}"}
 
