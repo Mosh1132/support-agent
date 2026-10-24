@@ -47,3 +47,16 @@ def test_refund_creates_pending_approval(connection):
     refund_order("ORD-2006", connection)
     row = connection.execute("SELECT order_id, status FROM approvals").fetchall()
     assert row == [("ORD-2006", "pending")]
+
+def test_order_does_not_get_refunded_twice(connection):
+    refund_order("ORD-2012", connection)
+    refund = refund_order("ORD-2012", connection)
+    assert refund["success"] == False
+
+def test_refund_creates_only_one_pending_approval(connection):
+    refund_order("ORD-2006", connection)
+    refund_order("ORD-2006", connection)
+    row = connection.execute("SELECT COUNT(*) FROM "
+                             "approvals").fetchone()[0]
+
+    assert row == 1

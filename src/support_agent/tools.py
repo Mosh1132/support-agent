@@ -21,8 +21,18 @@ def refund_order(order_id, connection):
     if row[0] != "Delivered":
         return {"success": False, "needs_human": False, "error": f"Order {clean_id} cannot be refunded"}
     if row[1] > REFUND_LIMIT:
-        connection.execute("INSERT INTO approvals (order_id, amount, status) VALUES (?, ?, ?)", (clean_id, row[1], 'pending'))
+        existing = connection.execute("SELECT 1 FROM approvals WHERE "
+                                     "order_id = ? AND status = "
+                                      "'pending'", (clean_id,)).fetchone()
+        if existing is None:
+            connection.execute("INSERT INTO approvals (order_id, "
+                               "amount, status) VALUES (?, ?, ?)",
+                               (clean_id, row[1], 'pending'))
+            connection.commit()
         return {"success": False, "needs_human": True, "message": f"Refund of ${row[1]} needs manager approval"}
+    connection.execute("UPDATE orders SET delivery_status "
+             "= ? WHERE order_id = ?", ("Refunded", clean_id))
+    connection.commit()
     return {"success": True, "needs_human": False, "message": f"Refund of ${row[1]} issued for order {clean_id}"}
 
 def normalize_order_id(order_id):
