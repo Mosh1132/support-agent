@@ -64,7 +64,10 @@ def call_openai(messages, tools):
                                      }, timeout=30)
 
             response.raise_for_status()
-            return response.json()
+            try:
+                return response.json()
+            except ValueError:
+                logging.error("Request did not return a JSON")
         except requests.exceptions.Timeout:
             logging.warning("Request timed out, retrying...")
         except requests.exceptions.HTTPError as err:
