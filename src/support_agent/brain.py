@@ -25,7 +25,7 @@ TOOL_DEFINITIONS = [
         "type" : "function",
         "function" : {
             "name" : "refund_order",
-            "description" : "Refund a delivered order by its order ID. Refunds over $100 are sent to a human for approval.",
+            "description" : "ONLY call this when the customer clearly asks you to refund an order. Do not call it for questions about whether a refund is possible.",
             "parameters" : {
                 "type" : "object",
                 "properties" : {

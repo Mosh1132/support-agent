@@ -99,7 +99,7 @@ def ingest_handbook(path, index):
         vectors=records
     )
 
-def search_handbook(question, index, top_k=3):
+def search_handbook(question, index, top_k=5):
     response = index.query(
         vector=embed_texts(question)[0],
         top_k=top_k,
