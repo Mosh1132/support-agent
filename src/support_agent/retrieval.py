@@ -2,9 +2,10 @@ import time
 import random
 import requests
 import logging
-from support_agent.config import get_api_key
+from pinecone import Pinecone, ServerlessSpec
+from support_agent.config import get_api_key, get_pinecone_key
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.WARNING, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 def split_into_chunks(text):
     chunks = []
@@ -61,3 +62,36 @@ def embed_texts(texts):
     logging.warning(f"Request failed after 4 attempts.")
     return None
 
+def create_pinecone_index(index_name='handbook'):
+    pc = Pinecone(api_key=get_pinecone_key())
+    if index_name not in pc.list_indexes().names():
+        pc.create_index(
+            name=index_name,
+            dimension=1536,
+            metric="cosine",
+            spec=ServerlessSpec(
+                cloud="aws",
+                region="us-east-1"
+            )
+        )
+    while not pc.describe_index(index_name).status["ready"]:
+        time.sleep(1)
+    index = pc.Index(index_name)
+    return index
+
+def ingest_handbook(path, index):
+    with open(path, encoding="utf-8") as f:
+        text = f.read()
+    chunks = split_into_chunks(text)
+    embeddings = embed_texts(chunks)
+    records = [
+        {
+            'id': f"policy_{x}",
+            "values": embeddings[x],
+            "metadata": {"text": chunks[x]}
+        } for x in range(len(embeddings))
+    ]
+
+    index.upsert(
+        vectors=records
+    )
