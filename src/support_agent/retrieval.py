@@ -84,6 +84,9 @@ def ingest_handbook(path, index):
         text = f.read()
     chunks = split_into_chunks(text)
     embeddings = embed_texts(chunks)
+    if embeddings is None:
+        logging.error("Embedder not working")
+        return None
     records = [
         {
             'id': f"policy_{x}",

@@ -35,6 +35,21 @@ TOOL_DEFINITIONS = [
             }
         }
     },
+{
+        "type" : "function",
+        "function" : {
+            "name" : "search_handbook",
+            "description" : "Search the company policy handbook for rules about refunds, returns, cancellations, and shipping. Use this to answer policy questions. Do not use it to look up or change a specific order.",
+            "parameters" : {
+                "type" : "object",
+                "properties" : {
+                    "question" : {"type" : "string",
+                                  "description" : "The customer's policy question, e.g. 'How long does shipping take?'"},
+                },
+                "required" : ["question"]
+            }
+        }
+    },
 ]
 def parse_response(response):
     message = response['choices'][0]['message']
