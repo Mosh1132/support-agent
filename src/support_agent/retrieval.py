@@ -95,3 +95,11 @@ def ingest_handbook(path, index):
     index.upsert(
         vectors=records
     )
+
+def search_handbook(question, index, top_k=3):
+    response = index.query(
+        vector=embed_texts(question)[0],
+        top_k=top_k,
+        include_metadata=True
+    )
+    return [policy.metadata['text'] for policy in response.matches]
