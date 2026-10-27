@@ -9,7 +9,7 @@ SAMPLE_ORDERS = [
 ]
 
 def get_connection(path="orders.db"):
-    connec = sqlite3.connect(path)
+    connec = sqlite3.connect(path, check_same_thread=False)
     connec.execute(
         "CREATE TABLE IF NOT EXISTS approvals (id INTEGER PRIMARY KEY"
         " AUTOINCREMENT,order_id TEXT, amount REAL, status TEXT)"
