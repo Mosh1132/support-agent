@@ -3,12 +3,14 @@ from functools import partial
 from support_agent.tools import get_order_status, refund_order
 from support_agent.retrieval import search_handbook
 
-def build_tools(connection, index):
+def build_orders_tools(connection):
     return {
         "get_order_status": partial(get_order_status, connection=connection),
-        "refund_order": partial(refund_order, connection=connection),
-        "search_handbook": partial(search_handbook, index=index),
+        "refund_order": partial(refund_order, connection=connection)
     }
+
+def build_policy_tools(index):
+    return {"search_handbook": partial(search_handbook, index=index)}
 
 def run_agent(question, brain, tools, history, max_steps=5):
     history.append({"role" : "user", "content" : question})
