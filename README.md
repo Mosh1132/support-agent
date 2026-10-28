@@ -1,5 +1,7 @@
 # Support Agent
 
+![tests](https://github.com/Mosh1132/support-agent/actions/workflows/ci.yml/badge.svg)
+
 A multi-agent customer-support system. A router sends each question to a specialist: an orders agent that looks up orders and issues refunds, or a policy agent that answers questions from a handbook. Refunds over $100 are never issued automatically. They are saved to an approval queue for a human.
 
 Built in Python with the OpenAI API, SQLite, Pinecone, FastAPI, Streamlit, and Docker.
