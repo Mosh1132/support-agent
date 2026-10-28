@@ -121,7 +121,7 @@ def classify_with_openai(question):
     messages = [
         {
             "role": "system",
-            "content": 'Reply with exactly one word. Reply "orders" if the question is about a specific order or asks for a refund. Otherwise reply "policy".',
+            "content": 'Reply with exactly one word. Reply "orders" only if the customer names a specific order ID, or asks you to take an action on their order such as a refund or cancellation. Reply "policy" for general questions about how things work, even if they mention orders or refunds.',
         },
         {"role": "user", "content": question},
     ]
