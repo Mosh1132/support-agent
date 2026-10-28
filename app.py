@@ -1,7 +1,9 @@
+import os
 import uuid
 import requests
 import streamlit as st
 
+api_url = os.environ.get("API_URL", "http://127.0.0.1:8000")
 st.title("Support agent")
 
 if "messages" not in st.session_state:
@@ -16,7 +18,7 @@ for message in st.session_state.messages:
 question = st.chat_input("Ask about an order or a policy")
 if question:
     response = requests.post(
-        "http://127.0.0.1:8000/chat",
+        f"{api_url}/chat",
         json={"session_id": st.session_state.session_id, "question": question},
         timeout=60,
     )
