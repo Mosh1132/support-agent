@@ -51,6 +51,10 @@ TOOL_DEFINITIONS = [
         }
     },
 ]
+
+ORDERS_DEFINITIONS = [d for d in TOOL_DEFINITIONS if d["function"]["name"] in ("get_order_status", "refund_order")]
+POLICY_DEFINITIONS = [d for d in TOOL_DEFINITIONS if d["function"]["name"] == "search_handbook"]
+
 def parse_response(response):
     message = response['choices'][0]['message']
     if message.get("tool_calls"):
@@ -105,8 +109,23 @@ def call_openai(messages, tools):
     logging.warning(f"Request failed after 4 attempts.")
     return None
 
-def openai_brain(messages):
-    response = call_openai(messages, TOOL_DEFINITIONS)
+def make_brain(definitions):
+    def brain(messages):
+        response = call_openai(messages, definitions)
+        if response is None:
+            return {"answer": "Sorry, something went wrong. A human will follow up."}
+        return parse_response(response)
+    return brain
+
+def classify_with_openai(question):
+    messages = [
+        {
+            "role": "system",
+            "content": 'Reply with exactly one word. Reply "orders" if the question is about a specific order or asks for a refund. Otherwise reply "policy".',
+        },
+        {"role": "user", "content": question},
+    ]
+    response = call_openai(messages, [])
     if response is None:
-        return {"answer": "Sorry, something went wrong. A human will follow up."}
-    return parse_response(response)
+        return "policy"
+    return response["choices"][0]["message"]["content"]
