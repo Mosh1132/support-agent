@@ -29,7 +29,8 @@ def refund_order(order_id, connection):
                                "amount, status) VALUES (?, ?, ?)",
                                (clean_id, row[1], 'pending'))
             connection.commit()
-        return {"success": False, "needs_human": True, "message": f"Refund of ${row[1]} can ONLY be decided by manager if approved."}
+        return {"success": False, "needs_human": True, "message": f"Refund of ${row[1]} can ONLY be decided by manager if approved."
+                                                                  f"It will be sent to manager for approval"}
     connection.execute("UPDATE orders SET delivery_status "
              "= ? WHERE order_id = ?", ("Refunded", clean_id))
     connection.commit()
