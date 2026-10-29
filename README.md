@@ -190,3 +190,8 @@ tests/           pytest suite
 - A customer asking "can I get a refund?" may create a pending approval, because the refund tool does not separate checking from requesting.
 - The agent's own replies are not saved in the server-side history, only the questions and tool results.
 - The handbook is fictional demo policy, and only some of it is enforced in code.
+
+## Possible Additions
+
+- Add a cancel_order tool
+- Add UI for approvals
